@@ -1,0 +1,40 @@
+name: CampusVibe CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    name: Build & Validate React SPA
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Vite Production Build
+        run: npm run build
+
+      - name: Verify build artifacts
+        run: |
+          test -f dist/index.html
+          echo "Build verified: dist/index.html exists."
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: campusvibe-dist
+          path: dist/
+
